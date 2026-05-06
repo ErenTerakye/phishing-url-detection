@@ -116,6 +116,22 @@ phishing-url-detection/
 
 ---
 
+## Kaynakça
+
+[1] A. Prasad and S. Chandra, "PhiUSIIL: A diverse security profile empowered phishing URL detection framework based on similarity index and incremental learning," *Computers & Security*, 2024. doi: [10.1016/j.cose.2023.103545](https://doi.org/10.1016/j.cose.2023.103545)
+
+[2] V. Vajrobol, B. B. Gupta, and A. Gaurav, "Mutual information based logistic regression for phishing URL detection," *Cyber Security and Applications*, 2024. doi: [10.1016/j.csa.2024.100044](https://doi.org/10.1016/j.csa.2024.100044)
+
+[3] J.-H. Yoon, S.-J. Buu, and H.-J. Kim, "Phishing Webpage Detection via Multi-Modal Integration of HTML DOM Graphs and URL Features Based on Graph Convolutional and Transformer Networks," *Electronics*, vol. 13, no. 16, 2024. doi: [10.3390/electronics13163344](https://doi.org/10.3390/electronics13163344)
+
+[4] R. S. Rao, C. Kondaiah, A. R. Pais, and B. Lee, "A hybrid super learner ensemble for phishing detection on mobile devices," *Scientific Reports*, 2025. doi: [10.1038/s41598-025-02009-8](https://doi.org/10.1038/s41598-025-02009-8)
+
+[5] M. A. Taha, H. D. A. Jabar, and W. K. Mohammed, "A Machine Learning Algorithms for Detecting Phishing Websites: A Comparative Study," *Iraqi Journal for Computer Science and Mathematics*, 2024. doi: [10.52866/ijcsm.2024.05.03.015](https://doi.org/10.52866/ijcsm.2024.05.03.015)
+
+[6] E. Kytidou, T. Tsikriki, G. Drosatos, and K. Rantos, "Machine learning techniques for phishing detection: A review of methods, challenges, and future directions," *Intelligent Decision Technologies*, 2025. doi: [10.1177/18724981251366763](https://doi.org/10.1177/18724981251366763)
+
+---
+
 ## Lisans
 
 MIT License © 2026
