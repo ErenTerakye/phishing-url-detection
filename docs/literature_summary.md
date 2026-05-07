@@ -79,6 +79,39 @@
 
 ---
 
+## Metodolojik Değerlendirme: Etiket Sızıntısı (Data Leakage)
+
+### Sorun: Neden %99–100 Doğruluk?
+
+PhiUSIIL veri setinde dört özellik, veri seti **oluşturulurken** meşru URL listesi kullanılarak hesaplanmıştır. Bu özellikler, meşru sınıfı doğrudan tanımlayan istatistiklerden türetildiğinden modele **etiketin kendisini** vermektedir; bu durum *veri seti yapısından kaynaklanan etiket sızıntısı* (construction-time leakage) olarak tanımlanır.
+
+| Sızıntılı Özellik | Sızıntı Mekanizması |
+|-------------------|---------------------|
+| `URLSimilarityIndex` | Veri seti toplanırken meşru URL'ler Tranco top-10M listesinden seçilmiştir. Bu özellik, aynı liste ile kosinüs benzerliği hesaplar → meşru URL'ler için çok yüksek, phishing için çok düşük çıkar; etiketi neredeyse deterministik olarak kodlar. |
+| `URLCharProb` | Karakter frekansı istatistikleri aynı meşru URL korpusundan elde edilmiştir → sınıflar arasında yapısal fark kaçınılmazdır. |
+| `TLDLegitimateProb` | TLD olasılığı meşru URL istatistiklerinden türetilmiştir → meşru siteler sistematik olarak yüksek, phishing siteleri sistematik olarak düşük skor alır. |
+| `URLTitleMatchScore` | Meşru sitelerin başlık–URL eşleşmesi önceden hesaplanmış meta veriyle yapılmaktadır. |
+
+### Örnekleme Yanlılığı (Sampling Bias)
+
+Sızıntıya ek olarak, veri seti toplama yöntemi örnekleme yanlılığı da içermektedir:
+- **Meşru URL'ler:** Tranco top-10M'den alınan köklü, uzun ömürlü siteler (google.com, wikipedia.org vb.)
+- **Phishing URL'leri:** PhishTank'tan alınan kısa ömürlü, genellikle rastgele oluşturulmuş domainler
+
+Bu iki grup, URL uzunluğu, domain yaşı ve karakter kalıpları açısından kolayca ayrıştırılabilir. Bu nedenle model, gerçek dünyada karşılaşılan **sofistike phishing saldırıları** (meşru siteleri taklit eden veya güvenilir TLD kullanan) için genellenemeyebilir.
+
+### Düzeltme: Deney 5
+
+Bu çalışmada söz konusu dört özellik `src/preprocessing.py`'deki `LEAKY_FEATURES` listesine alınmış ve `drop_leaky=True` parametresiyle pipeline'dan çıkarılmıştır. **Deney 5**, bu temiz özellik setiyle tüm modelleri yeniden değerlendirir ve gerçekçi bir performans tahmini sunar.
+
+Vajrobol vd. [2]'nin orijinal Deney 2 replikasyonu (`URLSimilarityIndex` dahil) kasıtlı olarak korunmuştur; Vajrobol'un %99.97 bulgusunun neden kolayca elde edilebildiğini göstermek için bu karşılaştırma öğretici değer taşımaktadır.
+
+### Literatürdeki Diğer Çalışmalarla Karşılaştırma
+
+Prasad & Chandra [1] ve Vajrobol vd. [2] aynı veri setini kullandığından, bildirdikleri yüksek doğruluklar kısmen bu sızıntıyı yansıtıyor olabilir. Kytidou vd. [6]'nın derleme çalışmasında da vurgulandığı üzere, phishing tespiti literatüründe veri seti kalitesi ve leakage kontrolü önemli bir açık araştırma sorunudur.
+
+---
+
 ## Araştırma Boşlukları ve Bu Çalışmanın Katkısı
 
 1. **Sistematik karşılaştırma eksikliği:** Vajrobol ve Prasad çalışmaları tek model/yaklaşıma odaklanmış; bu çalışma 6 farklı algoritmayı aynı ön işleme pipeline'ı ile karşılaştırmaktadır.

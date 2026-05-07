@@ -4,7 +4,15 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
 
 VAJROBOL_TOP5 = [
-    'URLSimilarityIndex',
+    'URLSimilarityIndex',   # NOTE: leaky — computed from the same legit URL corpus used for labeling
+    'LineOfCode',
+    'NoOfExternalRef',
+    'NoOfImage',
+    'NoOfSelfRef',
+]
+
+# Vajrobol-5 without the leaky URLSimilarityIndex feature
+VAJROBOL_TOP4_CLEAN = [
     'LineOfCode',
     'NoOfExternalRef',
     'NoOfImage',
@@ -46,3 +54,8 @@ def mutual_info_selection(X_train, y_train, k=20):
 
 def get_top5_vajrobol():
     return VAJROBOL_TOP5
+
+
+def get_top4_vajrobol_clean():
+    """Vajrobol-5 minus URLSimilarityIndex (the leaky feature)."""
+    return VAJROBOL_TOP4_CLEAN

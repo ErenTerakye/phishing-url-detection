@@ -6,6 +6,15 @@ from sklearn.model_selection import train_test_split
 IDENTIFIER_COLUMNS = ['FILENAME', 'URL', 'Domain', 'Title']
 TARGET_COLUMN = 'label'
 
+# These features are computed using the legitimate URL list used to *build* the dataset,
+# making them near-perfect label proxies (data leakage via dataset construction).
+LEAKY_FEATURES = [
+    'URLSimilarityIndex',   # cosine similarity against top-10M legit URLs → encodes the label
+    'URLCharProb',          # char frequency from legit URL corpus → systematically differs by class
+    'TLDLegitimateProb',    # TLD probability derived from the same legit URL list
+    'URLTitleMatchScore',   # precomputed title-URL match using legit site metadata
+]
+
 
 def load_data(filepath):
     df = pd.read_csv(filepath)
@@ -19,6 +28,13 @@ def drop_identifier_columns(df):
     cols_to_drop = [c for c in IDENTIFIER_COLUMNS if c in df.columns]
     df = df.drop(columns=cols_to_drop)
     print(f"Dropped identifier columns: {cols_to_drop}")
+    return df
+
+
+def drop_leaky_features(df):
+    cols_to_drop = [c for c in LEAKY_FEATURES if c in df.columns]
+    df = df.drop(columns=cols_to_drop)
+    print(f"Dropped leaky features: {cols_to_drop}")
     return df
 
 
@@ -63,9 +79,11 @@ def split_data(X, y, test_size=0.2, random_state=42):
     return X_train, X_test, y_train, y_test
 
 
-def full_preprocessing_pipeline(filepath):
+def full_preprocessing_pipeline(filepath, drop_leaky=False):
     df = load_data(filepath)
     df = drop_identifier_columns(df)
+    if drop_leaky:
+        df = drop_leaky_features(df)
     y = df[TARGET_COLUMN]
     X = df.drop(columns=[TARGET_COLUMN])
     X, tld_encoder = encode_tld(X, fit=True)
