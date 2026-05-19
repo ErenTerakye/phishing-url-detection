@@ -1,0 +1,8 @@
+Kaynak,Yontem,Veri Seti,Accuracy,F1-Score,Recall,Not
+Prasad & Chandra (2024),BernoulliNB + Passive-Aggressive + SGD,PhiUSIIL,0.9924,0.9921,,PhiUSIIL veri setini ve incremental learning yaklasimini tanitir.
+Vajrobol vd. (2024),Mutual information + Logistic Regression,PhiUSIIL,0.9997,0.9997,,URLSimilarityIndex dahil 5 ozellik kullanir.
+Yoon vd. (2024),CNN + Transformer + GCN,Common Crawl + PhishTank,0.9812,0.9789,,URL/HTML/graf temsillerini birlikte kullanir.
+Rao vd. (2025),Hybrid Super Learner ensemble,PhishDump,0.9893,,,Mobil cihaz senaryosunda stacking yaklasimi.
+Taha vd. (2024),"LR, DT, RF, AdaBoost, XGBoost",UCI Phishing Websites,0.9689,,,Kucuk veri setinde klasik ML karsilastirmasi.
+Bu Calisma (2026),Leakage-free XGBoost,PhiUSIIL,0.9999363854195381,0.999925700274909,0.9999009361533508,Sizintili ozellikler cikarilarak degerlendirildi.
+Bu Calisma (2026),Vajrobol-5 Logistic Regression replikasyonu,PhiUSIIL,0.9962679446129052,0.9956221083528183,0.9912823814948735,URLSimilarityIndex dahil literatur replikasyonu.

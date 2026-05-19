@@ -3,9 +3,13 @@ data/*.csv
 data/*.xlsx
 data/*.parquet
 *.csv
+!results/
+!results/metrics/
+!results/metrics/*.csv
 
 # Python
 __pycache__/
+.cache/
 *.py[cod]
 *.pyo
 .Python

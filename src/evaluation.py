@@ -11,20 +11,33 @@ from sklearn.metrics import (
 from sklearn.model_selection import cross_val_score
 
 
-def evaluate_model(model, X_test, y_test):
+def evaluate_model(model, X_test, y_test, positive_label=0):
     y_pred = model.predict(X_test)
-    y_prob = model.predict_proba(X_test)[:, 1] if hasattr(model, 'predict_proba') else None
+    y_score = get_model_scores(model, X_test, positive_label=positive_label)
     return {
         'Accuracy':  accuracy_score(y_test, y_pred),
-        'Precision': precision_score(y_test, y_pred),
-        'Recall':    recall_score(y_test, y_pred),
-        'F1-Score':  f1_score(y_test, y_pred),
-        'ROC-AUC':   roc_auc_score(y_test, y_prob) if y_prob is not None else None,
+        'Precision': precision_score(y_test, y_pred, pos_label=positive_label, zero_division=0),
+        'Recall':    recall_score(y_test, y_pred, pos_label=positive_label, zero_division=0),
+        'F1-Score':  f1_score(y_test, y_pred, pos_label=positive_label, zero_division=0),
+        'ROC-AUC':   roc_auc_score((y_test == positive_label).astype(int), y_score) if y_score is not None else None,
     }
 
 
+def get_model_scores(model, X, positive_label=0):
+    if hasattr(model, 'predict_proba'):
+        classes = list(model.classes_)
+        return model.predict_proba(X)[:, classes.index(positive_label)]
+    if hasattr(model, 'decision_function'):
+        scores = model.decision_function(X)
+        classes = list(model.classes_)
+        if len(classes) == 2 and positive_label == classes[0]:
+            return -scores
+        return scores
+    return None
+
+
 def plot_confusion_matrix(y_true, y_pred, model_name, save_path=None):
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(y_true, y_pred, labels=[1, 0])
     fig, ax = plt.subplots(figsize=(6, 5))
     sns.heatmap(
         cm, annot=True, fmt='d', cmap='Blues', ax=ax,
@@ -42,14 +55,15 @@ def plot_confusion_matrix(y_true, y_pred, model_name, save_path=None):
     plt.close(fig)
 
 
-def plot_roc_curves(models_dict, X_test, y_test, save_path=None):
+def plot_roc_curves(models_dict, X_test, y_test, save_path=None, positive_label=0):
     fig, ax = plt.subplots(figsize=(9, 7))
     for name, model in models_dict.items():
-        if not hasattr(model, 'predict_proba'):
+        y_score = get_model_scores(model, X_test, positive_label=positive_label)
+        if y_score is None:
             continue
-        y_prob = model.predict_proba(X_test)[:, 1]
-        fpr, tpr, _ = roc_curve(y_test, y_prob)
-        auc = roc_auc_score(y_test, y_prob)
+        y_binary = (y_test == positive_label).astype(int)
+        fpr, tpr, _ = roc_curve(y_binary, y_score)
+        auc = roc_auc_score(y_binary, y_score)
         ax.plot(fpr, tpr, label=f'{name} (AUC={auc:.4f})')
     ax.plot([0, 1], [0, 1], 'k--', linewidth=1)
     ax.set_xlabel('False Positive Rate')

@@ -21,7 +21,7 @@ Bu proje, UCI Machine Learning Repository'den alınan **PhiUSIIL Phishing URL Da
 | Meşru URL | 134.850 (%57.2) |
 | Phishing URL | 100.945 (%42.8) |
 | Eksik değer | Yok |
-| Hedef değişken | `label` (0=Meşru, 1=Phishing) |
+| Hedef değişken | `label` (1=Meşru, 0=Phishing) |
 
 ---
 
@@ -45,7 +45,16 @@ data/PhiUSIIL_Phishing_URL_Dataset.csv
 
 ## Kullanım
 
-Notebook'ları sırayla çalıştır:
+Final rapor ve sunumda kullanılacak tüm deney çıktılarını tek komutla üret:
+
+```bash
+.venv/bin/python scripts/run_final_experiments.py
+.venv/bin/python scripts/build_final_artifacts.py
+```
+
+İlk komut `results/metrics/` altında CSV tablolarını ve `results/figures/` altında rapor/sunum görsellerini üretir. İkinci komut bu sayıları kullanarak `docs/final_report.md`, `docs/final_presentation_outline.md` ve `reports/final_report_leakage_aware.docx` dosyalarını oluşturur.
+
+Notebook'ları etkileşimli inceleme için sırayla çalıştır:
 
 | # | Notebook | İçerik |
 |---|----------|--------|

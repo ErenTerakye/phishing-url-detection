@@ -2,7 +2,7 @@ import time
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 from xgboost import XGBClassifier
 
@@ -11,15 +11,25 @@ def get_baseline_models():
     return {
         'Logistic Regression': LogisticRegression(max_iter=1000, random_state=42),
         'Decision Tree': DecisionTreeClassifier(random_state=42),
-        'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1),
+        'Random Forest': RandomForestClassifier(
+            n_estimators=120,
+            random_state=42,
+            n_jobs=-1,
+            class_weight='balanced_subsample',
+        ),
         'XGBoost': XGBClassifier(
-            n_estimators=100,
+            n_estimators=150,
+            max_depth=6,
+            learning_rate=0.1,
             random_state=42,
             n_jobs=-1,
             eval_metric='logloss',
+            tree_method='hist',
             verbosity=0,
         ),
-        'SVM': SVC(kernel='rbf', probability=True, random_state=42),
+        # LinearSVC is used instead of RBF SVC because PhiUSIIL has 235k rows.
+        # It keeps the SVM comparison reproducible while avoiding impractical runtime.
+        'SVM': LinearSVC(random_state=42, class_weight='balanced', max_iter=5000),
         'KNN': KNeighborsClassifier(n_neighbors=5),
     }
 

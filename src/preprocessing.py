@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 
 IDENTIFIER_COLUMNS = ['FILENAME', 'URL', 'Domain', 'Title']
 TARGET_COLUMN = 'label'
+PHISHING_LABEL = 0
+LEGITIMATE_LABEL = 1
 
 # These features are computed using the legitimate URL list used to *build* the dataset,
 # making them near-perfect label proxies (data leakage via dataset construction).
@@ -86,7 +88,8 @@ def full_preprocessing_pipeline(filepath, drop_leaky=False):
         df = drop_leaky_features(df)
     y = df[TARGET_COLUMN]
     X = df.drop(columns=[TARGET_COLUMN])
-    X, tld_encoder = encode_tld(X, fit=True)
     X_train, X_test, y_train, y_test = split_data(X, y)
+    X_train, tld_encoder = encode_tld(X_train, fit=True)
+    X_test, _ = encode_tld(X_test, fit=False, encoder=tld_encoder)
     X_train_sc, X_test_sc, scaler = scale_features(X_train, X_test)
     return X_train_sc, X_test_sc, y_train, y_test, tld_encoder, scaler

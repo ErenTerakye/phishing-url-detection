@@ -1,0 +1,64 @@
+{
+  "data_path": "data/PhiUSIIL_Phishing_URL_Dataset.csv",
+  "n_rows": 235795,
+  "n_columns": 56,
+  "class_counts": {
+    "0": 100945,
+    "1": 134850
+  },
+  "leaky_features_removed": [
+    "URLSimilarityIndex",
+    "URLCharProb",
+    "TLDLegitimateProb",
+    "URLTitleMatchScore"
+  ],
+  "vajrobol_features": [
+    "URLSimilarityIndex",
+    "LineOfCode",
+    "NoOfExternalRef",
+    "NoOfImage",
+    "NoOfSelfRef"
+  ],
+  "rf_top20": [
+    "URLSimilarityIndex",
+    "NoOfExternalRef",
+    "LineOfCode",
+    "NoOfImage",
+    "NoOfSelfRef",
+    "NoOfJS",
+    "NoOfCSS",
+    "HasSocialNet",
+    "NoOfOtherSpecialCharsInURL",
+    "IsHTTPS",
+    "HasCopyrightInfo",
+    "NoOfDegitsInURL",
+    "LargestLineLength",
+    "DegitRatioInURL",
+    "HasDescription",
+    "URLLength",
+    "IsResponsive",
+    "NoOfLettersInURL",
+    "SpacialCharRatioInURL",
+    "DomainTitleMatchScore"
+  ],
+  "best_leakage_free_model": "XGBoost",
+  "metrics_files": {
+    "exp1": "results/metrics/experiment_1_full_features.csv",
+    "exp2": "results/metrics/experiment_2_vajrobol_5.csv",
+    "exp3": "results/metrics/experiment_3_rf_top20.csv",
+    "exp4": "results/metrics/experiment_4_leakage_free.csv",
+    "delta": "results/metrics/leakage_delta.csv",
+    "literature": "results/metrics/literature_comparison.csv",
+    "cv": "results/metrics/cv_leakage_free_top3.csv"
+  },
+  "figure_files": [
+    "results/figures/class_distribution.png",
+    "results/figures/confusion_matrix_leakage_free_best.png",
+    "results/figures/feature_importance_rf_top20.png",
+    "results/figures/leakage_delta.png",
+    "results/figures/leaky_feature_correlations.png",
+    "results/figures/model_metric_comparison.png",
+    "results/figures/roc_curves_leakage_free.png"
+  ],
+  "generated_at": "2026-05-19 15:38:06"
+}
