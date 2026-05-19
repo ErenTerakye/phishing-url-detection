@@ -1,146 +1,146 @@
-# Phishing URL Tespiti — PhiUSIIL Veri Seti ile Karşılaştırmalı Makine Öğrenmesi Analizi
+# Phishing URL Tespiti - PhiUSIIL Karşılaştırmalı ML Deneyleri
 
-Eskişehir Osmangazi Üniversitesi, Bilgisayar Mühendisliği Bölümü  
-Makine Öğrenmesi Dersi — Dönem Projesi (2025–2026 Bahar)
+## Amaç
 
----
+Bu proje, PhiUSIIL phishing URL veri seti üzerinde yalnızca en yüksek doğruluk değerini aramak yerine farklı makine öğrenmesi modellerini, farklı özellik seçimi stratejilerini ve başarı-maliyet-yorumlanabilirlik dengesini karşılaştırmalı olarak analiz eder.
 
-## Proje Özeti
+Final rapor iddiası:
 
-Bu proje, UCI Machine Learning Repository'den alınan **PhiUSIIL Phishing URL Dataset** (235.795 örnek, 54 özellik) üzerinde çoklu makine öğrenmesi modellerini karşılaştırmaktadır. Hedef; Logistic Regression, Decision Tree, Random Forest, XGBoost, SVM ve KNN algoritmalarını sistematik bir deney protokolüyle değerlendirmek ve literatürdeki çalışmalarla sonuçları karşılaştırmaktır.
-
----
+> Bu çalışmada literatürdeki kaynaklardan farklı olarak yalnızca tek bir model veya tek bir özellik seçimi yöntemi kullanılmamış; PhiUSIIL veri seti üzerinde farklı algoritmalar ve farklı özellik kümeleri aynı deneysel çerçevede karşılaştırılmıştır. Böylece phishing URL tespitinde en yüksek doğruluğun yanında daha az özellikle çalışabilen, daha hızlı ve daha yorumlanabilir modellerin uygulanabilirliği de değerlendirilmiştir.
 
 ## Veri Seti
 
-| Özellik | Değer |
-|---------|-------|
-| Kaynak | [UCI ML Repository](https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset) |
-| Toplam örnek | 235.795 |
-| Özellik sayısı | 54 (4 tanımlayıcı sütun çıkarıldıktan sonra 50 + encoded TLD) |
-| Meşru URL | 134.850 (%57.2) |
-| Phishing URL | 100.945 (%42.8) |
-| Eksik değer | Yok |
-| Hedef değişken | `label` (1=Meşru, 0=Phishing) |
+- Veri seti: PhiUSIIL Phishing URL Dataset
+- Beklenen dosya yolu: `data/PhiUSIIL_Phishing_URL_Dataset.csv`
+- Yaklaşık boyut: 235.795 örnek, 54+ sütun
+- Hedef değişken otomatik aranır: `label`, `Label`, `class`, `Class`, `status`, `Result`, `phishing`, `is_phishing`
+- Ham metin/tanımlayıcı sütunlar, örneğin `URL`, `Domain`, `Title`, modelden çıkarılır.
 
----
+## Kullanılan Modeller
+
+- Logistic Regression
+- Decision Tree
+- Random Forest
+- Linear SVM
+- XGBoost, kurulu değilse otomatik atlanır
+- GaussianNB
+- SGDClassifier
+
+## Özellik Seçimi Senaryoları
+
+- `S1_FULL`: Tüm kullanılabilir özellikler
+- `S2_VAJROBOL_5`: `URLSimilarityIndex`, `LineOfCode`, `NoOfExternalRef`, `NoOfImage`, `NoOfSelfRef`
+- `S3_MI_TOP_K`: Mutual Information ile Top 5, 10, 15, 20
+- `S4_TREE_IMPORTANCE_TOP_K`: Tree importance ile Top 10, 15, 20
+
+Feature selection adımları pipeline içinde çalışır; selector test verisine fit edilmez.
 
 ## Kurulum
 
 ```bash
-# Sanal ortam oluştur (önerilir)
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-
-# Bağımlılıkları yükle
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Veri setini indirip `data/` klasörüne koy:
-```
-data/PhiUSIIL_Phishing_URL_Dataset.csv
-```
+## Çalıştırma
 
----
-
-## Kullanım
-
-Final rapor ve sunumda kullanılacak tüm deney çıktılarını tek komutla üret:
+Hızlı doğrulama için 20.000 satırlık debug modu:
 
 ```bash
-.venv/bin/python scripts/run_final_experiments.py
-.venv/bin/python scripts/build_final_artifacts.py
+.venv/bin/python phishing_experiment.py --debug
 ```
 
-İlk komut `results/metrics/` altında CSV tablolarını ve `results/figures/` altında rapor/sunum görsellerini üretir. İkinci komut bu sayıları kullanarak `docs/final_report.md`, `docs/final_presentation_outline.md` ve `reports/final_report_leakage_aware.docx` dosyalarını oluşturur.
+Tüm veri seti ile final deneyleri:
 
-Notebook'ları etkileşimli inceleme için sırayla çalıştır:
-
-| # | Notebook | İçerik |
-|---|----------|--------|
-| 1 | `notebooks/01_EDA.ipynb` | Keşifsel veri analizi, dağılımlar, korelasyon |
-| 2 | `notebooks/02_preprocessing.ipynb` | Veri ön işleme, leakage önleme |
-| 3 | `notebooks/03_feature_selection.ipynb` | RF önem skorları, MI, korelasyon analizi |
-| 4 | `notebooks/04_model_training.ipynb` | Tüm deneylerin eğitimi |
-| 5 | `notebooks/05_results_analysis.ipynb` | Karşılaştırmalı analiz, grafikler |
-
----
-
-## Klasör Yapısı
-
+```bash
+.venv/bin/python phishing_experiment.py
 ```
+
+Varsayılan özellik profili `url-only` profilidir. Bu profil yalnızca URL'den
+üretilebilir lexical özellikleri kullanır ve HTML/içerik tabanlı özellikleri
+dışarıda bırakır. Bu, gerçek dünyada URL metni geldiğinde hızlı karar veren bir
+phishing URL tespit sistemi için daha dürüst bir senaryodur.
+
+URL + HTML/içerik özelliklerinin tamamını karşılaştırma amacıyla çalıştırmak
+için:
+
+```bash
+.venv/bin/python phishing_experiment.py --profile all
+```
+
+Varsayılan çalışma leakage-aware moddur. `URLSimilarityIndex`, `URLCharProb`,
+`TLDLegitimateProb` ve `URLTitleMatchScore` gibi veri setinin oluşturulma
+sürecinden gelen, IRL senaryoda etikete fazla yakın davranabilecek özellikler
+dışarıda bırakılır.
+
+Varsayılan split de domain bazlıdır: aynı `Domain` değeri train ve test
+tarafında birlikte bulunmaz. Bu, rastgele satır bölmeye göre daha gerçekçi bir
+genelleme testidir.
+
+Literatürdeki yüksek skorları replikasyon amacıyla görmek için:
+
+```bash
+.venv/bin/python phishing_experiment.py --include-leaky
+```
+
+Bu mod final yorumunda gerçek dünya performansı gibi sunulmamalıdır.
+
+Eski rastgele holdout protokolünü karşılaştırma amacıyla çalıştırmak için:
+
+```bash
+.venv/bin/python phishing_experiment.py --split random
+```
+
+Farklı veri yolu:
+
+```bash
+.venv/bin/python phishing_experiment.py --data data/PhiUSIIL_Phishing_URL_Dataset.csv
+```
+
+## Üretilen Çıktılar
+
+`outputs/tables/`
+
+- `results_summary.csv`
+- `selected_features.csv`
+- `tree_feature_importance.csv`
+- `best_model_metrics.txt`
+- `report_comment_tr.txt`
+
+`outputs/figures/`
+
+- `model_comparison_f1.png`
+- `model_comparison_accuracy.png`
+- `model_comparison_recall.png`
+- `training_time_comparison.png`
+- `confusion_matrix_best_model.png`
+- `feature_importance_top20.png`
+
+`outputs/models/`
+
+- `best_model.joblib`
+
+## Kod Yapısı
+
+```text
 phishing-url-detection/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── data/               # CSV buraya konulur (repo'ya eklenmez)
-├── notebooks/          # Sıralı Jupyter notebook'lar
-├── src/                # Yeniden kullanılabilir Python modülleri
-│   ├── preprocessing.py
-│   ├── feature_selection.py
+├── data/
+├── notebooks/
+├── src/
+│   ├── data_utils.py
 │   ├── models.py
-│   └── evaluation.py
-├── results/
-│   ├── figures/        # PNG grafikler (dpi=150)
-│   └── metrics/        # CSV metrik tabloları
-└── docs/
-    └── literature_summary.md
+│   ├── evaluation.py
+│   └── visualization.py
+├── outputs/
+│   ├── figures/
+│   ├── models/
+│   └── tables/
+├── phishing_experiment.py
+├── requirements.txt
+└── README.md
 ```
 
----
+## Final Raporda Vurgulanacak Katkı
 
-## Deney Protokolü
-
-| Deney | Özellik Seti | Amaç |
-|-------|-------------|------|
-| 1 | Tüm özellikler (50+TLD) | Baseline karşılaştırma |
-| 2 | Vajrobol'un 5 özelliği | Literatür replikasyonu |
-| 3 | RF Top-20 | Özellik seçiminin etkisi |
-| 4 | 10-Fold CV | Genellenebilirlik kontrolü |
-
----
-
-## Hedef Metrikler
-
-| Metrik | Hedef |
-|--------|-------|
-| Accuracy | ≥ %97 |
-| F1-Score | ≥ %96 |
-| **Recall** | **≥ %97** ← Odak metrik |
-| ROC-AUC | ≥ 0.98 |
-
-> Recall odak metriktir çünkü False Negative (kaçırılan phishing) en kritik hatadır.
-
----
-
-## Literatür Karşılaştırması
-
-| Kaynak | Yöntem | Veri Seti | Accuracy |
-|--------|--------|-----------|----------|
-| Prasad & Chandra (2024) | BernoulliNB+PAC+SGD | PhiUSIIL | %99.24 |
-| **Vajrobol vd. (2024)** | **LR (5 özellik)** | **PhiUSIIL** | **%99.97** |
-| Yoon vd. (2024) | CNN+Transformer+GCN | Common Crawl | %98.12 |
-| Rao vd. (2025) | Super Learner Ensemble | PhishDump | %98.93 |
-| Taha vd. (2024) | LR, DT, RF, XGB | Phishing Websites | %96.89 |
-
----
-
-## Kaynakça
-
-[1] A. Prasad and S. Chandra, "PhiUSIIL: A diverse security profile empowered phishing URL detection framework based on similarity index and incremental learning," *Computers & Security*, 2024. doi: [10.1016/j.cose.2023.103545](https://doi.org/10.1016/j.cose.2023.103545)
-
-[2] V. Vajrobol, B. B. Gupta, and A. Gaurav, "Mutual information based logistic regression for phishing URL detection," *Cyber Security and Applications*, 2024. doi: [10.1016/j.csa.2024.100044](https://doi.org/10.1016/j.csa.2024.100044)
-
-[3] J.-H. Yoon, S.-J. Buu, and H.-J. Kim, "Phishing Webpage Detection via Multi-Modal Integration of HTML DOM Graphs and URL Features Based on Graph Convolutional and Transformer Networks," *Electronics*, vol. 13, no. 16, 2024. doi: [10.3390/electronics13163344](https://doi.org/10.3390/electronics13163344)
-
-[4] R. S. Rao, C. Kondaiah, A. R. Pais, and B. Lee, "A hybrid super learner ensemble for phishing detection on mobile devices," *Scientific Reports*, 2025. doi: [10.1038/s41598-025-02009-8](https://doi.org/10.1038/s41598-025-02009-8)
-
-[5] M. A. Taha, H. D. A. Jabar, and W. K. Mohammed, "A Machine Learning Algorithms for Detecting Phishing Websites: A Comparative Study," *Iraqi Journal for Computer Science and Mathematics*, 2024. doi: [10.52866/ijcsm.2024.05.03.015](https://doi.org/10.52866/ijcsm.2024.05.03.015)
-
-[6] E. Kytidou, T. Tsikriki, G. Drosatos, and K. Rantos, "Machine learning techniques for phishing detection: A review of methods, challenges, and future directions," *Intelligent Decision Technologies*, 2025. doi: [10.1177/18724981251366763](https://doi.org/10.1177/18724981251366763)
-
----
-
-## Lisans
-
-MIT License © 2026
+Bu deney çerçevesi, PhiUSIIL üzerinde tek bir model sonucunu raporlamak yerine klasik ML algoritmalarını ve birden fazla özellik seçimi yaklaşımını aynı train-test protokolüyle değerlendirir. Böylece doğruluk, recall, F1-score, eğitim süresi, tahmin süresi ve kullanılan özellik sayısı birlikte raporlanır.

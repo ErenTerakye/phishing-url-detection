@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -21,6 +22,57 @@ def evaluate_model(model, X_test, y_test, positive_label=0):
         'F1-Score':  f1_score(y_test, y_pred, pos_label=positive_label, zero_division=0),
         'ROC-AUC':   roc_auc_score((y_test == positive_label).astype(int), y_score) if y_score is not None else None,
     }
+
+
+def evaluate_experiment_model(
+    model,
+    X_train,
+    X_test,
+    y_train,
+    y_test,
+    feature_set_name,
+    model_name,
+    feature_count,
+    positive_label,
+):
+    """Fit a model/pipeline and return metrics plus timing information."""
+    train_start = time.perf_counter()
+    model.fit(X_train, y_train)
+    train_time = time.perf_counter() - train_start
+
+    pred_start = time.perf_counter()
+    y_pred = model.predict(X_test)
+    prediction_time = time.perf_counter() - pred_start
+
+    y_score = get_model_scores(model, X_test, positive_label=positive_label)
+    y_true_binary = (pd.Series(y_test).to_numpy() == positive_label).astype(int)
+
+    roc_auc = np.nan
+    if y_score is not None:
+        try:
+            roc_auc = roc_auc_score(y_true_binary, y_score)
+        except ValueError:
+            roc_auc = np.nan
+
+    cm = confusion_matrix(y_test, y_pred, labels=[positive_label, _negative_label(y_test, positive_label)])
+    return {
+        "Feature Set": feature_set_name,
+        "Model": model_name,
+        "Accuracy": accuracy_score(y_test, y_pred),
+        "Precision": precision_score(y_test, y_pred, pos_label=positive_label, zero_division=0),
+        "Recall": recall_score(y_test, y_pred, pos_label=positive_label, zero_division=0),
+        "F1-score": f1_score(y_test, y_pred, pos_label=positive_label, zero_division=0),
+        "ROC-AUC": roc_auc,
+        "Training Time (s)": train_time,
+        "Prediction Time (s)": prediction_time,
+        "Feature Count": feature_count,
+        "Confusion Matrix": cm.tolist(),
+    }, model, y_pred
+
+
+def _negative_label(y, positive_label):
+    labels = [label for label in pd.Series(y).unique().tolist() if label != positive_label]
+    return labels[0] if labels else positive_label
 
 
 def get_model_scores(model, X, positive_label=0):
