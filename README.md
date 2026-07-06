@@ -4,10 +4,6 @@
 
 Bu proje, PhiUSIIL phishing URL veri seti üzerinde yalnızca en yüksek doğruluk değerini aramak yerine farklı makine öğrenmesi modellerini, farklı özellik seçimi stratejilerini ve başarı-maliyet-yorumlanabilirlik dengesini karşılaştırmalı olarak analiz eder.
 
-Final rapor iddiası:
-
-> Bu çalışmada literatürdeki kaynaklardan farklı olarak yalnızca tek bir model veya tek bir özellik seçimi yöntemi kullanılmamış; PhiUSIIL veri seti üzerinde farklı algoritmalar ve farklı özellik kümeleri aynı deneysel çerçevede karşılaştırılmıştır. Böylece phishing URL tespitinde en yüksek doğruluğun yanında daha az özellikle çalışabilen, daha hızlı ve daha yorumlanabilir modellerin uygulanabilirliği de değerlendirilmiştir.
-
 ## Veri Seti
 
 - Veri seti: PhiUSIIL Phishing URL Dataset
@@ -140,7 +136,3 @@ phishing-url-detection/
 ├── requirements.txt
 └── README.md
 ```
-
-## Final Raporda Vurgulanacak Katkı
-
-Bu deney çerçevesi, PhiUSIIL üzerinde tek bir model sonucunu raporlamak yerine klasik ML algoritmalarını ve birden fazla özellik seçimi yaklaşımını aynı train-test protokolüyle değerlendirir. Böylece doğruluk, recall, F1-score, eğitim süresi, tahmin süresi ve kullanılan özellik sayısı birlikte raporlanır.
